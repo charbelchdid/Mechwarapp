@@ -92,7 +92,7 @@ class _SelectRegionScreenWidgetState extends State<SelectRegionScreenWidget> {
                           padding: EdgeInsetsDirectional.fromSTEB(16, 12, 16, 0),
                           child: GestureDetector(
                             onTap: (){
-                              if(_RegionsList.data[index].name=='Ehden')Navigator.push(context, MaterialPageRoute(builder: (context)=>NavBarPage(rowguid: '${_RegionsList.data[index].rowGuid}', startingPage: 1,)));},
+                              if(_RegionsList.data[index].name=='Ehden')Navigator.push(context, MaterialPageRoute(builder: (context)=>NavBarPage(rowguid: '${_RegionsList.data[index].rowGuid}', startingPage: 4,)));},
                             child: Container(
                               width: double.infinity,
                               decoration: BoxDecoration(

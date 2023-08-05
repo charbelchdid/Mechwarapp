@@ -57,31 +57,6 @@ class _UserprofileScreenWidgetState extends State<UserprofileScreenWidget>
     return Scaffold(
       key: scaffoldKey,
       backgroundColor: FlutterFlowTheme.of(context).secondaryBackground,
-      appBar: AppBar(
-        backgroundColor: FlutterFlowTheme.of(context).secondaryBackground,
-        automaticallyImplyLeading: false,
-        actions: [
-          Padding(
-            padding: EdgeInsetsDirectional.fromSTEB(0, 0, 12, 0),
-            child: FlutterFlowIconButton(
-              borderColor: Colors.transparent,
-              borderRadius: 30,
-              borderWidth: 1,
-              buttonSize: 60,
-              icon: Icon(
-                Icons.close_rounded,
-                color: FlutterFlowTheme.of(context).secondaryText,
-                size: 30,
-              ),
-              onPressed: () async {
-                Navigator.pop(context);
-              },
-            ),
-          ),
-        ],
-        centerTitle: false,
-        elevation: 0,
-      ),
       body: provider1.state==0?
       Center(
         child:FFButtonWidget(

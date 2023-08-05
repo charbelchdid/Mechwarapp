@@ -9,9 +9,13 @@ import 'Services/GetUserRowg.dart';
 import 'Services/NotificationService.dart';
 import 'flutter_flow/flutter_flow_theme.dart';
 
+import 'home_screen/home_screen_widget.dart';
+import 'hotel_booking/hotel_home_screen.dart';
 import 'index.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+
+import 'new_res/home.dart';
 
 
 void main() async {
@@ -115,36 +119,7 @@ class SplashScreen extends StatelessWidget {
                 fit:BoxFit.cover,
               )
             ),
-            child: Container(
-              alignment: Alignment.bottomRight,
-              child: Image.asset('assets/images/baladie.jpeg',width: 120,height: 120,),
-            ),
-          )
-            // Container(
-            //   padding: EdgeInsets.only(bottom: 16),
-            //   alignment: Alignment.bottomRight,
-            //   child: SizedBox(
-            //     width: 130, // Adjust the width according to your needs
-            //     child: Image.asset('assets/images/baladie.jpeg'), // Replace with your sponsor image path
-            //   ),
-            // ),
-            // Column(
-            //   children: [
-            //     Center(
-            //       child: Container(
-            //         height: MediaQuery.of(context).size.height/2,
-            //           width: MediaQuery.of(context).size.height/2,
-            //           child: Image.asset("assets/images/logo.png")
-            //       ),
-            //     ),
-            //     Container(
-            //       height: 200,
-            //         width: 200,
-            //         child: Image.asset("assets/images/baladie.jpeg")
-            //     ),
-            //   ],
-            // ),
-          ;
+          );
         }
       },
     );
@@ -180,9 +155,12 @@ class _NavBarPageState extends State<NavBarPage> {
     _currentPageName = widget.initialPage ?? _currentPageName;
     screens=[
       ActivitiesScreenWidget(Regionrowguid: widget.rowguid,),
-      PlaceScreenWidget(Regionrowguid: widget.rowguid,),
-      RestaurantsScreenWidget(RegionRowguid: widget.rowguid,),
-      HotelScreenWidget(),
+      RestaurantNew(),
+      //RestaurantsScreenWidget(RegionRowguid: widget.rowguid,),
+      //PlaceScreenWidget(Regionrowguid: widget.rowguid,),
+      HotelHomeScreen(),
+      UserprofileScreenWidget(),
+      Home()
     ];
   }
 
@@ -206,8 +184,8 @@ class _NavBarPageState extends State<NavBarPage> {
         //   ),
         ),
         actions: [
+          IconButton(onPressed: (){ Navigator.push(context, MaterialPageRoute(builder: (context)=>MapScreenWidget(rowg: widget.rowguid)));}, icon:Icon(Icons.map,color: Colors.grey,size: 30,),),
           IconButton(onPressed: (){ Navigator.pop(context);}, icon:Icon(Icons.place,color: Colors.grey,size: 30,),),
-          IconButton(onPressed: (){Navigator.push(context, MaterialPageRoute(builder: (context)=>UserprofileScreenWidget()));}, icon:SvgPicture.asset(options,color: Colors.grey,height: 30,width: 30,)),//Icon(Icons.more,color:FlutterFlowTheme.of(context).primaryText),iconSize: 30,),
           SizedBox(width: 10,)
         ],
         centerTitle: false,
@@ -219,11 +197,10 @@ class _NavBarPageState extends State<NavBarPage> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-
-          Navigator.push(context,
-              MaterialPageRoute(builder: (context) => MapScreenWidget(rowg: widget.rowguid,)));
+          _onTabSelected(4);
+          currentScreen=screens[currentTab];
         },
-        child: Icon(Icons.map),
+        child: Icon(Icons.explore),
         backgroundColor: FlutterFlowTheme.of(context).primaryColor,
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
@@ -241,7 +218,7 @@ class _NavBarPageState extends State<NavBarPage> {
               children: [
                 IconButton(
                   icon: Icon(
-                    Icons.hiking,
+                    Icons.event_available,
                     color: currentTab == 0 ? FlutterFlowTheme.of(context).primaryColor : Colors.grey,
                     size: 30,
                   ),
@@ -250,7 +227,7 @@ class _NavBarPageState extends State<NavBarPage> {
                     currentScreen=screens[currentTab];
                   },
                 ),
-                currentTab==0? Text('Activities',style: TextStyle(color: FlutterFlowTheme.of(context).primaryColor ),):SizedBox(height: 0,width:0,)
+                currentTab==0? Text('Events',style: TextStyle(color: FlutterFlowTheme.of(context).primaryColor ),):SizedBox(height: 0,width:0,)
               ],
             ),
             Column(
@@ -258,7 +235,7 @@ class _NavBarPageState extends State<NavBarPage> {
               children: [
                 IconButton(
                   icon: Icon(
-                    FontAwesomeIcons.mapPin,
+                    Icons.restaurant,
                     color: currentTab == 1 ? FlutterFlowTheme.of(context).primaryColor : Colors.grey,
                     size: 30,
                   ),
@@ -267,7 +244,7 @@ class _NavBarPageState extends State<NavBarPage> {
                     currentScreen=screens[currentTab];
                   },
                 ),
-                currentTab==1? Text('Places',style: TextStyle(color: FlutterFlowTheme.of(context).primaryColor ),):SizedBox(height: 0,width:0,)
+                currentTab==1? Text('Restaurants',style: TextStyle(color: FlutterFlowTheme.of(context).primaryColor ),):SizedBox(height: 0,width:0,)
               ],
             ),
             SizedBox(width: 48.0), // Empty space for the FAB
@@ -276,7 +253,7 @@ class _NavBarPageState extends State<NavBarPage> {
               children: [
                 IconButton(
                   icon: Icon(
-                    Icons.restaurant,
+                    Icons.hotel,
                     color: currentTab== 2 ? FlutterFlowTheme.of(context).primaryColor: Colors.grey,
                     size: 30,
                   ),
@@ -285,7 +262,7 @@ class _NavBarPageState extends State<NavBarPage> {
                     currentScreen=screens[currentTab];
                   },
                 ),
-                currentTab==2? Text('Restaurants',style: TextStyle(color: FlutterFlowTheme.of(context).primaryColor ),):SizedBox(height: 0,width:0,)
+                currentTab==2? Text('Hotels',style: TextStyle(color: FlutterFlowTheme.of(context).primaryColor ),):SizedBox(height: 0,width:0,)
               ],
             ),
             Column(
@@ -293,7 +270,7 @@ class _NavBarPageState extends State<NavBarPage> {
               children: [
                 IconButton(
                   icon: Icon(
-                    Icons.hotel,
+                    Icons.person,
                     color: currentTab == 3 ? FlutterFlowTheme.of(context).primaryColor : Colors.grey,
                     size: 30,
                   ),
@@ -302,7 +279,7 @@ class _NavBarPageState extends State<NavBarPage> {
                     currentScreen=screens[currentTab];
                   },
                 ),
-                currentTab==3? Text('Hotels',style: TextStyle(color: FlutterFlowTheme.of(context).primaryColor ),):SizedBox(height: 0,width:0,)
+                currentTab==3? Text('Profile',style: TextStyle(color: FlutterFlowTheme.of(context).primaryColor ),):SizedBox(height: 0,width:0,)
               ],
             ),
           ],
