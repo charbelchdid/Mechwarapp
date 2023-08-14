@@ -44,68 +44,6 @@ class _HomeState extends State<Home> {
     );
   }
 
-  Widget appBar() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: _padding),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: const [
-          Icon(
-            FontAwesomeIcons.barsStaggered,
-            color: kSecondaryColor,
-            size: 24,
-          ),
-          Icon(
-            FontAwesomeIcons.bell,
-            color: kSecondaryColor,
-            size: 24,
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget header() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: _padding),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Where do',
-                  style: TextStyle(
-                    color: kSecondaryColor.withOpacity(0.6),
-                    fontSize: 22,
-                    fontFamily: 'Montserrat',
-                  ),
-                ),
-                const SizedBox(height: 4),
-                const Text(
-                  'you want to go?',
-                  style: TextStyle(
-                    color: kSecondaryColor,
-                    fontSize: 24,
-                    fontFamily: 'Montserrat',
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          const CircleAvatar(
-            backgroundColor: kAvatarColor,
-            radius: 26,
-            backgroundImage: AssetImage("assets/images/avatar.png"),
-          ),
-        ],
-      ),
-    );
-  }
-
   Widget searchBar() {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: _padding),

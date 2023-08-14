@@ -42,6 +42,8 @@ class Hotel {
   String openingTime;
   String closingTime;
   String services;
+  int minprice;
+  int maxprice;
 
   Hotel({
     required this.rowGuid,
@@ -56,6 +58,8 @@ class Hotel {
     required this.openingTime,
     required this.closingTime,
     required this.services,
+    required this.minprice,
+    required this.maxprice,
   });
 
   factory Hotel.fromJson(Map<String, dynamic> json) => Hotel(
@@ -71,6 +75,8 @@ class Hotel {
     openingTime: json["opening_time"],
     closingTime: json["closing_time"],
     services: json["services"],
+    minprice: json["minprice"],
+    maxprice: json["maxprice"],
   );
 
   Map<String, dynamic> toJson() => {
@@ -86,5 +92,7 @@ class Hotel {
     "opening_time": openingTime,
     "closing_time": closingTime,
     "services": services,
+    "minprice": minprice,
+    "maxprice": maxprice,
   };
 }

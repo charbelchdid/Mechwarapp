@@ -11,25 +11,22 @@ import '../trip_details_screen/trip_details_screen_widget.dart';
 import '../userprofile_screen/userprofile_screen_widget.dart';
 import 'activities_screen_model.dart';
 export 'activities_screen_model.dart';
+
 class ActivitiesScreenWidget extends StatefulWidget {
-  ActivitiesScreenWidget({Key? key,required this.Regionrowguid}) : super(key: key);
-  final String Regionrowguid;
+  ActivitiesScreenWidget({Key? key}) : super(key: key);
   @override
   _ActivitiesScreenWidgetState createState() => _ActivitiesScreenWidgetState();
 }
 
-class _ActivitiesScreenWidgetState extends State<ActivitiesScreenWidget> {
+class _ActivitiesScreenWidgetState extends State<ActivitiesScreenWidget> with TickerProviderStateMixin{
   late ActivitiesScreenModel _model;
   final scaffoldKey = GlobalKey<ScaffoldState>();
-
+  AnimationController? animationController;
   @override
   void initState() {
     super.initState();
-    final provider = Provider.of<LoadProvider>(context, listen: false);
-    provider.getActivity(widget.Regionrowguid,provider.state==0?'c1b63fcf-b58e-4996-9679-48c9d38b6eef':provider.userRowguid);
-    provider.getPlacesList(widget.Regionrowguid);
-    provider.getRestaurants(widget.Regionrowguid);
-    provider.getHotel(widget.Regionrowguid);
+    animationController = AnimationController(
+        duration: const Duration(milliseconds: 1000), vsync: this);
     _model = createModel(context, () => ActivitiesScreenModel());
   }
 
@@ -43,49 +40,7 @@ class _ActivitiesScreenWidgetState extends State<ActivitiesScreenWidget> {
   @override
   Widget build(BuildContext context) {
     final provider = Provider.of<LoadProvider>(context, listen: true);
-    return Scaffold(
-      key: scaffoldKey,
-      backgroundColor: FlutterFlowTheme.of(context).primaryBackground,
-      body:provider.ActivityList.length==0?Center(child: Container(
-        padding: EdgeInsets.symmetric(horizontal: 24.0),
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [
-              Color(0xFFAEE571), // Replace with your desired gradient start color
-              Color(0xFF6BBE82), // Replace with your desired gradient end color
-            ],
-          ),
-        ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Text(
-              'Awesome Activities Coming Soon!',
-              textAlign: TextAlign.center,
-              style: FlutterFlowTheme.of(context).title1.override(
-                fontFamily: 'Lexend Deca',
-                fontSize: 40,
-                fontWeight: FontWeight.normal,
-                color: Color(0xFF333333)
-              ),
-            ),
-            SizedBox(height: 50.0),
-            Text(
-              'Discover exciting trips and experiences tailored just for you.',
-              textAlign: TextAlign.center,
-              style: FlutterFlowTheme.of(context).title2.override(
-                fontFamily: 'Lexend Deca',
-                fontSize: 15,
-                fontWeight: FontWeight.normal,
-                color: Color(0xFF666666)
-              ),
-            ),
-          ],
-        ),
-      ),):provider.ActivityList[0].region!=widget.Regionrowguid?Center(child: CircularProgressIndicator()): SingleChildScrollView(
+    return SingleChildScrollView(
         physics: BouncingScrollPhysics(),
         child: Column(
           mainAxisSize: MainAxisSize.max,
@@ -130,110 +85,127 @@ class _ActivitiesScreenWidgetState extends State<ActivitiesScreenWidget> {
                   scrollDirection: Axis.vertical,
                   itemCount: provider.ActivityList.length,
                   itemBuilder: (BuildContext context, int index,) {
-                    return
-                      Padding(
-                        padding: EdgeInsetsDirectional.fromSTEB(16, 8, 16, 0),
-                        child: GestureDetector(
-                          onTap: (){
-                            Navigator.push(context, MaterialPageRoute(builder: (context)=>TripDetailsScreenWidget(tripdetail: provider.ActivityList[index],)));
-                          },
-                          child: Container(
-                            width: double.infinity,
-                            height: 200,
-                            decoration: BoxDecoration(
-                              color: FlutterFlowTheme.of(context).secondaryBackground,
-                              image: DecorationImage(
-                                fit: BoxFit.fitWidth,
-                                image: CachedNetworkImageProvider(
-                                  provider.ActivityList[index].picture,
-                                ),
-                              ),
-                              boxShadow: [
-                                BoxShadow(
-                                  blurRadius: 3,
-                                  color: Color(0x33000000),
-                                  offset: Offset(0, 2),
-                                )
-                              ],
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            child: Padding(
-                              padding: EdgeInsetsDirectional.fromSTEB(0, 120, 0, 0),
+                    final int count =
+                    provider.ActivityList.length > 10 ? 10 : provider.ActivityList.length;
+                    final Animation<double> animation =
+                    Tween<double>(begin: 0.0, end: 1.0).animate(
+                        CurvedAnimation(
+                            parent: animationController!,
+                            curve: Interval(
+                                (1 / count) * index, 1.0,
+                                curve: Curves.fastOutSlowIn)));
+                    animationController?.forward();
+
+                    return AnimatedBuilder(animation: animation, builder: (BuildContext context, Widget? child)
+                      {return FadeTransition(
+                        opacity: animationController!,
+                        child: Transform(
+                          transform: Matrix4.translationValues(
+                              0.0, 50 * (1.0 - animation!.value), 0.0),
+                          child: Padding(
+                            padding: EdgeInsetsDirectional.fromSTEB(16, 8, 16, 0),
+                            child: GestureDetector(
+                              onTap: (){
+                                Navigator.push(context, MaterialPageRoute(builder: (context)=>TripDetailsScreenWidget(tripdetail: provider.ActivityList[index],)));
+                              },
                               child: Container(
-                                width: 100,
-                                height: 100,
+                                width: double.infinity,
+                                height: 200,
                                 decoration: BoxDecoration(
-                                  color: FlutterFlowTheme.of(context)
-                                      .secondaryBackground,
-                                  borderRadius: BorderRadius.only(
-                                    bottomLeft: Radius.circular(8),
-                                    bottomRight: Radius.circular(8),
-                                    topLeft: Radius.circular(0),
-                                    topRight: Radius.circular(0),
+                                  color: FlutterFlowTheme.of(context).secondaryBackground,
+                                  image: DecorationImage(
+                                    fit: BoxFit.fitWidth,
+                                    image: CachedNetworkImageProvider(
+                                      provider.ActivityList[index].picture,
+                                    ),
                                   ),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      blurRadius: 3,
+                                      color: Color(0x33000000),
+                                      offset: Offset(0, 2),
+                                    )
+                                  ],
+                                  borderRadius: BorderRadius.circular(8),
                                 ),
                                 child: Padding(
-                                  padding:
-                                  EdgeInsetsDirectional.fromSTEB(16, 0, 16, 0),
-                                  child: Row(
-                                    mainAxisSize: MainAxisSize.max,
-                                    children: [
-                                      Expanded(
-                                        child: Text(
-                                          '${provider.ActivityList[index].title}',
-                                          style:
-                                          FlutterFlowTheme.of(context).title2,
-                                        ),
+                                  padding: EdgeInsetsDirectional.fromSTEB(0, 120, 0, 0),
+                                  child: Container(
+                                    width: 100,
+                                    height: 100,
+                                    decoration: BoxDecoration(
+                                      color: FlutterFlowTheme.of(context)
+                                          .secondaryBackground,
+                                      borderRadius: BorderRadius.only(
+                                        bottomLeft: Radius.circular(8),
+                                        bottomRight: Radius.circular(8),
+                                        topLeft: Radius.circular(0),
+                                        topRight: Radius.circular(0),
                                       ),
-                                      Column(
+                                    ),
+                                    child: Padding(
+                                      padding:
+                                      EdgeInsetsDirectional.fromSTEB(16, 0, 16, 0),
+                                      child: Row(
                                         mainAxisSize: MainAxisSize.max,
-                                        mainAxisAlignment: MainAxisAlignment.center,
                                         children: [
-                                          FFButtonWidget(
-                                            onPressed: () {
-                                              Navigator.push(context, MaterialPageRoute(builder: (context)=>TripDetailsScreenWidget(tripdetail: provider.ActivityList[index],)));
-                                            },
-                                            text:provider.ActivityList[index].isReserved==false?'Details':'Reserved',
-                                            icon: provider.ActivityList[index].isReserved==false?Icon(
-                                              Icons.add_rounded,
-                                              color: Colors.white,
-                                              size: 15,
-                                            ):Icon(
-                                              Icons.check,
-                                              color: Colors.white,
-                                              size: 15,
+                                          Expanded(
+                                            child: Text(
+                                              '${provider.ActivityList[index].title}',
+                                              style:
+                                              FlutterFlowTheme.of(context).title2,
                                             ),
-                                            options: FFButtonOptions(
-                                              width: 120,
-                                              height: 40,
-                                              color:FlutterFlowTheme.of(context).primaryColor,
-                                              textStyle: GoogleFonts.getFont(
-                                                'Lexend Deca',
-                                                color: Colors.white,
-                                                fontSize: 14,
+                                          ),
+                                          Column(
+                                            mainAxisSize: MainAxisSize.max,
+                                            mainAxisAlignment: MainAxisAlignment.center,
+                                            children: [
+                                              FFButtonWidget(
+                                                onPressed: () {
+                                                  Navigator.push(context, MaterialPageRoute(builder: (context)=>TripDetailsScreenWidget(tripdetail: provider.ActivityList[index],)));
+                                                },
+                                                text:provider.ActivityList[index].isReserved==false?'Details':'Reserved',
+                                                icon: provider.ActivityList[index].isReserved==false?Icon(
+                                                  Icons.add_rounded,
+                                                  color: Colors.white,
+                                                  size: 15,
+                                                ):Icon(
+                                                  Icons.check,
+                                                  color: Colors.white,
+                                                  size: 15,
+                                                ),
+                                                options: FFButtonOptions(
+                                                  width: 120,
+                                                  height: 40,
+                                                  color:FlutterFlowTheme.of(context).primaryColor,
+                                                  textStyle: GoogleFonts.getFont(
+                                                    'Lexend Deca',
+                                                    color: Colors.white,
+                                                    fontSize: 14,
+                                                  ),
+                                                  elevation: 3,
+                                                  borderSide: BorderSide(
+                                                    color: Colors.transparent,
+                                                    width: 1,
+                                                  ),
+                                                ),
                                               ),
-                                              elevation: 3,
-                                              borderSide: BorderSide(
-                                                color: Colors.transparent,
-                                                width: 1,
-                                              ),
-                                            ),
+                                            ],
                                           ),
                                         ],
                                       ),
-                                    ],
+                                    ),
                                   ),
                                 ),
                               ),
                             ),
                           ),
                         ),
-                      );}
+                      );});}
               ),
             ),
           ],
         ),
-      )
-    );
+      );
   }
 }

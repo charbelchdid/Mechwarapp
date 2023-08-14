@@ -12,6 +12,7 @@ import '../provider/LoadProvider.dart';
 import 'select_region_screen_model.dart';
 export 'select_region_screen_model.dart';
 import 'package:provider/provider.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class SelectRegionScreenWidget extends StatefulWidget {
   const SelectRegionScreenWidget({Key? key}) : super(key: key);
@@ -28,16 +29,13 @@ class _SelectRegionScreenWidgetState extends State<SelectRegionScreenWidget> {
   final _unfocusNode = FocusNode();
 
   late Regions _RegionsList=Regions(success: false, data: []);
+  late List<Datum> _filteredList=[];
 
   void _getData() async {
     final provider = Provider.of<LoadProvider>(context, listen: false);
     _RegionsList = provider.Region;
-    for(int i=0;i<_RegionsList.data.length;i++){
-      if(_RegionsList.data[i].name=='Ehden'){
-        _RegionsList.data.insert(0, _RegionsList.data[i]);
-        _RegionsList.data.removeAt(i+1);
-      }
-    }
+    _RegionsList.data.sort((a, b) => a.name.compareTo(b.name));
+    _filteredList=_RegionsList.data;
   }
   @override
   void initState() {
@@ -76,12 +74,13 @@ class _SelectRegionScreenWidgetState extends State<SelectRegionScreenWidget> {
           physics: BouncingScrollPhysics(),
           //mainAxisSize: MainAxisSize.max,
           children: [
+            getSearchBarUI(),
             Padding(
-              padding: EdgeInsetsDirectional.fromSTEB(0, 20, 0, 0),
+              padding: EdgeInsetsDirectional.fromSTEB(0, 10, 0, 0),
               child: _RegionsList.data==[]?CircularProgressIndicator():SingleChildScrollView(
                 child: ListView.builder(
                   physics: NeverScrollableScrollPhysics(),
-                  itemCount: _RegionsList.data.length,
+                  itemCount: _filteredList.length,
                   shrinkWrap: true,
                   itemBuilder: (BuildContext context, int index)=>
                     Column(
@@ -92,7 +91,7 @@ class _SelectRegionScreenWidgetState extends State<SelectRegionScreenWidget> {
                           padding: EdgeInsetsDirectional.fromSTEB(16, 12, 16, 0),
                           child: GestureDetector(
                             onTap: (){
-                              if(_RegionsList.data[index].name=='Ehden')Navigator.push(context, MaterialPageRoute(builder: (context)=>NavBarPage(rowguid: '${_RegionsList.data[index].rowGuid}', startingPage: 4,)));},
+                            Navigator.push(context, MaterialPageRoute(builder: (context)=>NavBarPage(rowguid: '${_filteredList[index].rowGuid}', startingPage: 4,)));},
                             child: Container(
                               width: double.infinity,
                               decoration: BoxDecoration(
@@ -115,17 +114,9 @@ class _SelectRegionScreenWidgetState extends State<SelectRegionScreenWidget> {
                                           child: Stack(
                                             children: [
                                               CachedNetworkImage(
-                                                imageUrl: '${_RegionsList.data[index].image}',
+                                                imageUrl: '${_filteredList[index].image}',
                                                 fit: BoxFit.cover,
                                               ),
-                                              if (_RegionsList.data[index].name!='Ehden')
-                                                Positioned(
-                                                  child: Icon(
-                                                    Icons.lock,
-                                                    size: 70,
-                                                    color: Colors.grey,
-                                                  ),
-                                                ),
                                             ],
                                           ),
                                         ),
@@ -136,12 +127,8 @@ class _SelectRegionScreenWidgetState extends State<SelectRegionScreenWidget> {
                                       child: Padding(
                                         padding: EdgeInsets.fromLTRB(16, 0, 0, 0),
                                         child: Text(
-                                          _RegionsList.data[index].name=='Ehden'
-                                              ? '${_RegionsList.data[index].name} - ${_RegionsList.data[index].arabicName}'
-                                              : '${_RegionsList.data[index].name} - ${_RegionsList.data[index].arabicName} Coming Soon',
-                                          style: _RegionsList.data[index].name=='Ehden'
-                                              ? FlutterFlowTheme.of(context).subtitle1
-                                              : FlutterFlowTheme.of(context).subtitle2,
+                                          '${_filteredList[index].name} - ${_filteredList[index].arabicName}',
+                                          style:FlutterFlowTheme.of(context).subtitle1,
                                         ),
                                       ),
                                     ),
@@ -158,6 +145,87 @@ class _SelectRegionScreenWidgetState extends State<SelectRegionScreenWidget> {
             ),
           ],
         ),
+      ),
+    );
+  }
+  Widget getSearchBarUI() {
+    return Padding(
+      padding: const EdgeInsets.only(left: 16, right: 16, top: 8, bottom: 8),
+      child: Row(
+        children: <Widget>[
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.only(right: 16, top: 8, bottom: 8),
+              child: Container(
+                decoration: BoxDecoration(
+                  color: FlutterFlowTheme.of(context).primaryBackground,
+                  borderRadius: const BorderRadius.all(
+                    Radius.circular(38.0),
+                  ),
+                  boxShadow: <BoxShadow>[
+                    BoxShadow(
+                        color: Colors.grey.withOpacity(0.2),
+                        offset: const Offset(0, 2),
+                        blurRadius: 8.0),
+                  ],
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.only(
+                      left: 16, right: 16, top: 4, bottom: 4),
+                  child: TextField(
+                    onChanged: (String txt) {
+                      setState(() {
+                        _filteredList=_RegionsList.data.where((restaurant) => restaurant.name
+                            .toLowerCase()
+                            .contains(txt.toLowerCase()))
+                            .toList();
+                      });
+                    },
+                    style: const TextStyle(
+                      fontSize: 18,
+                    ),
+                    cursorColor: FlutterFlowTheme.of(context).primaryColor,
+                    decoration: InputDecoration(
+                      border: InputBorder.none,
+                      hintText: 'Search...',
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+          Container(
+            decoration: BoxDecoration(
+              color: FlutterFlowTheme.of(context).primaryColor,
+              borderRadius: const BorderRadius.all(
+                Radius.circular(38.0),
+              ),
+              boxShadow: <BoxShadow>[
+                BoxShadow(
+                    color: Colors.grey.withOpacity(0.4),
+                    offset: const Offset(0, 2),
+                    blurRadius: 8.0),
+              ],
+            ),
+            child: Material(
+              color: Colors.transparent,
+              child: InkWell(
+                borderRadius: const BorderRadius.all(
+                  Radius.circular(32.0),
+                ),
+                onTap: () {
+                  FocusScope.of(context).requestFocus(FocusNode());
+                },
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Icon(FontAwesomeIcons.magnifyingGlass,
+                      size: 20,
+                      color: FlutterFlowTheme.of(context).primaryBackground),
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

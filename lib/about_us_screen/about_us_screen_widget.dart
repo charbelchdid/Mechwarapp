@@ -47,7 +47,18 @@ class AboutUsPage extends StatelessWidget {
                 textAlign: TextAlign.center,
               ),
             ),
-            
+            SizedBox(height: 20,),
+            Center(
+              child: Text(
+                'Meet the team',
+                style:FlutterFlowTheme.of(context).title2,
+              ),
+            ),
+            SizedBox(height: 20,),
+            _buildTeamMember('https://csp-aub.s3.amazonaws.com/our-team/Charbel.jpg', 'Charbel Chdid', 'Software developer', '', context),
+            SizedBox(height: 10,),
+            _buildTeamMember('https://csp-aub.s3.amazonaws.com/our-team/Diana.jpg', 'Diana Abboud', 'Public Relations', '', context),
+
           ],
         ),
       ),

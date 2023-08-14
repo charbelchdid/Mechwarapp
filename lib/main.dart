@@ -1,21 +1,25 @@
 import 'package:c_s_p_app/provider/LoadProvider.dart';
+import 'package:c_s_p_app/restaurant_screen/home.dart';
 import 'package:flutter/material.dart';
 
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+
 import 'package:provider/provider.dart';
 import 'Services/Connection.dart';
 import 'Services/GetUserRowg.dart';
 
 import 'Services/NotificationService.dart';
+import 'discover_screen/discover_screen_widget.dart';
 import 'flutter_flow/flutter_flow_theme.dart';
 
 import 'home_screen/home_screen_widget.dart';
-import 'hotel_booking/hotel_home_screen.dart';
+import 'hotel_screen/hotel_home_screen.dart';
 import 'index.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
-import 'new_res/home.dart';
+import 'package:flutter_ripple/flutter_ripple.dart';
+
 
 
 void main() async {
@@ -38,6 +42,7 @@ void main() async {
           Provider.of<ConnectivityProvider>(context, listen: false).initConnectivity();
           return MaterialApp(
             home: ConnectivityHandler(
+
               child: MyApp(),
             ),
           );
@@ -154,22 +159,29 @@ class _NavBarPageState extends State<NavBarPage> {
     currentTab  = widget.startingPage;
     _currentPageName = widget.initialPage ?? _currentPageName;
     screens=[
-      ActivitiesScreenWidget(Regionrowguid: widget.rowguid,),
+      ActivitiesScreenWidget(),
       RestaurantNew(),
       //RestaurantsScreenWidget(RegionRowguid: widget.rowguid,),
       //PlaceScreenWidget(Regionrowguid: widget.rowguid,),
       HotelHomeScreen(),
       UserprofileScreenWidget(),
-      Home()
+      List13PropertyListviewWidget(Regionrowguid: widget.rowguid,)
     ];
+    final provider = Provider.of<LoadProvider>(context, listen: false);
+    provider.getActivity(widget.rowguid,provider.state==0?'c1b63fcf-b58e-4996-9679-48c9d38b6eef':provider.userRowguid);
+    provider.getPlacesList(widget.rowguid);
+    provider.getRestaurants(widget.rowguid);
+    provider.getHotel(widget.rowguid);
   }
-
 
   @override
   Widget build(BuildContext context) {
+    final provider = Provider.of<LoadProvider>(context, listen: true);
     final String options = 'assets/icons/options.svg';
     const IconData globe = IconData(0xf68d, );
-    return Scaffold(
+    return provider.PlacesList.length!=0 && provider.ActivityList.length!=0? provider.ActivityList[0].region!=widget.rowguid?Scaffold(body: Center(child: FlutterRipple(
+        rippleColor:FlutterFlowTheme.of(context).primaryColor, child: Text("Flutter Ripple"),
+    ),)):Scaffold(
       resizeToAvoidBottomInset: false,
       appBar:AppBar(
         backgroundColor: FlutterFlowTheme.of(context).secondaryBackground,
@@ -285,6 +297,8 @@ class _NavBarPageState extends State<NavBarPage> {
           ],
         ),
       ),
-    );
+    ):Scaffold(body: Center(child: FlutterRipple(
+      rippleColor:FlutterFlowTheme.of(context).primaryColor, child: Text(""),
+    ),));
   }
 }
